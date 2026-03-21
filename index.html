@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diego Vásquez — Desarrollador Fullstack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── RESET & BASE ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a0a;
+      --bg2:       #111111;
+      --bg3:       #161616;
+      --border:    #222222;
+      --green:     #00ff87;
+      --green-dim: #00cc6a;
+      --green-glow:#00ff8733;
+      --amber:     #ffb700;
+      --text:      #e8e8e8;
+      --text-dim:  #888888;
+      --text-faint:#444444;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ──────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ── SCROLLBAR ──────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 2px; }
+
+    /* ── SELECTION ──────────────────────────────────────────────────── */
+    ::selection { background: var(--green); color: var(--bg); }
+
+    /* ── NAV ────────────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--green);
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--text-dim); font-weight: 400; }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--green); }
+
+    .nav-cta {
+      background: transparent;
+      border: 1px solid var(--green);
+      color: var(--green) !important;
+      padding: 0.4rem 1rem;
+      border-radius: 2px;
+      transition: background 0.2s, color 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--green) !important;
+      color: var(--bg) !important;
+    }
+
+    /* ── HERO ───────────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grid background */
+    #hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* Green glow */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: 20%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--green);
+      border: 1px solid var(--green-dim);
+      padding: 0.3rem 0.8rem;
+      border-radius: 2px;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-name {
+      font-family: var(--font-sans);
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero-name .accent { color: var(--green); }
+
+    .hero-role {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      color: var(--text-dim);
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-role .highlight {
+      color: var(--amber);
+      font-weight: 500;
+    }
+
+    .hero-desc {
+      margin-top: 1.5rem;
+      max-width: 560px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.9;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .hero-actions {
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1rem;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: var(--bg);
+      padding: 0.75rem 1.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      background: var(--green-dim);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-dim);
+      padding: 0.75rem 1.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      display: inline-block;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-dim);
+      color: var(--text);
+    }
+
+    /* Terminal widget */
+    .hero-terminal {
+      position: absolute;
+      right: 3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 360px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      animation: fadeUp 0.8s 0.5s ease both;
+      z-index: 1;
+    }
+
+    .terminal-bar {
+      background: var(--bg3);
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    .terminal-title {
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 0.65rem;
+      color: var(--text-faint);
+      letter-spacing: 0.05em;
+    }
+
+    .terminal-body {
+      padding: 1.2rem 1.4rem;
+      font-size: 0.78rem;
+      line-height: 2;
+    }
+
+    .t-prompt { color: var(--green); }
+    .t-cmd    { color: var(--text); }
+    .t-out    { color: var(--text-dim); }
+    .t-key    { color: var(--amber); }
+    .t-val    { color: var(--green); }
+    .t-cursor {
+      display: inline-block;
+      width: 8px; height: 14px;
+      background: var(--green);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+
+    /* ── STACK STRIP ────────────────────────────────────────────────── */
+    #stack {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 3rem;
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      overflow-x: auto;
+      background: var(--bg2);
+    }
+
+    .stack-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-faint);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .stack-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+
+    .stack-item:hover { color: var(--green); }
+
+    .stack-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green-dim);
+      flex-shrink: 0;
+    }
+
+    /* ── SECTIONS SHARED ────────────────────────────────────────────── */
+    section {
+      padding: 6rem 3rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .section-num {
+      font-size: 0.65rem;
+      color: var(--green);
+      letter-spacing: 0.15em;
+    }
+
+    .section-title {
+      font-family: var(--font-sans);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin-left: 1rem;
+    }
+
+    /* ── SOBRE MÍ ───────────────────────────────────────────────────── */
+    #sobre {
+      background: var(--bg);
+    }
+
+    .sobre-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .sobre-text p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.95;
+      margin-bottom: 1.2rem;
+    }
+
+    .sobre-text p strong {
+      color: var(--text);
+    }
+
+    .sobre-text .accent-green { color: var(--green); }
+
+    .sobre-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2rem;
+    }
+
+    .sobre-card-title {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-faint);
+      margin-bottom: 1.5rem;
+    }
+
+    .skill-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+
+    .skill-row:last-child { border-bottom: none; }
+
+    .skill-name { color: var(--text); }
+
+    .skill-bar-wrap {
+      width: 120px;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .skill-bar {
+      height: 100%;
+      background: var(--green);
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    /* ── PROYECTOS ──────────────────────────────────────────────────── */
+    #proyectos {
+      background: var(--bg2);
+    }
+
+    .proyectos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-card:hover {
+      border-color: var(--green-dim);
+      transform: translateY(-3px);
+    }
+
+    .project-card.featured {
+      border-color: var(--green-dim);
+      grid-column: span 2;
+      flex-direction: row;
+    }
+
+    .project-card.featured .project-body {
+      flex: 1;
+    }
+
+    .project-badge {
+      display: inline-block;
+      background: var(--green-glow);
+      color: var(--green);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      border: 1px solid var(--green-dim);
+      margin-bottom: 1rem;
+    }
+
+    .project-body {
+      padding: 2rem;
+    }
+
+    .project-number {
+      font-size: 0.65rem;
+      color: var(--text-faint);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.1em;
+    }
+
+    .project-name {
+      font-family: var(--font-sans);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.8rem;
+      letter-spacing: -0.02em;
+    }
+
+    .project-desc {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tag {
+      font-size: 0.65rem;
+      color: var(--text-faint);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    .project-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: auto;
+    }
+
+    .project-link {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+
+    .project-link:hover { color: var(--green); }
+
+    .project-link-arrow { color: var(--green); }
+
+    /* Featured visual panel */
+    .project-visual {
+      width: 280px;
+      background: var(--bg3);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    .stat-block {
+      text-align: center;
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: 3px;
+    }
+
+    .stat-num {
+      font-family: var(--font-sans);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--green);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 0.3rem;
+    }
+
+    /* ── CASO DE ESTUDIO ────────────────────────────────────────────── */
+    #caso {
+      background: var(--bg);
+      position: relative;
+    }
+
+    #caso::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 40%;
+      height: 100%;
+      background: radial-gradient(ellipse at top right, var(--green-glow) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .caso-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .caso-sidebar {
+      position: sticky;
+      top: 7rem;
+      height: fit-content;
+    }
+
+    .caso-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--green);
+      margin-bottom: 0.8rem;
+    }
+
+    .caso-title {
+      font-family: var(--font-sans);
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .caso-sub {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .caso-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .meta-key {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-faint);
+    }
+
+    .meta-val {
+      font-size: 0.82rem;
+      color: var(--text);
+    }
+
+    .caso-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .caso-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      border-radius: 0 4px 4px 0;
+      padding: 1.5rem 2rem;
+    }
+
+    .caso-block-title {
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .caso-block-icon { color: var(--green); }
+
+    .caso-block p, .caso-block li {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      line-height: 1.85;
+    }
+
+    .caso-block ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .caso-block ul li {
+      padding: 0.3rem 0;
+      padding-left: 1.2rem;
+      position: relative;
+    }
+
+    .caso-block ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .metric-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: 3px;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-family: var(--font-sans);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .metric-desc {
+      font-size: 0.68rem;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 0.2rem;
+    }
+
+    .skill-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .skill-pill {
+      background: var(--green-glow);
+      color: var(--green);
+      border: 1px solid var(--green-dim);
+      font-size: 0.72rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── CONTACTO ───────────────────────────────────────────────────── */
+    #contacto {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+    }
+
+    .contacto-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .contacto-eyebrow {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--green);
+      margin-bottom: 1rem;
+    }
+
+    .contacto-title {
+      font-family: var(--font-sans);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.1;
+    }
+
+    .contacto-sub {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .contacto-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .contacto-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.4rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      text-decoration: none;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .contacto-link:hover {
+      border-color: var(--green);
+      color: var(--green);
+      background: var(--green-glow);
+    }
+
+    /* ── FOOTER ─────────────────────────────────────────────────────── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--text-faint);
+    }
+
+    /* ── ANIMATIONS ─────────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .hero-terminal { display: none; }
+      .project-card.featured { grid-column: span 1; flex-direction: column; }
+      .project-visual { display: none; }
+      .caso-wrapper { grid-template-columns: 1fr; }
+      .caso-sidebar { position: static; }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      section { padding: 4rem 1.5rem; }
+      #hero { padding: 7rem 1.5rem 4rem; }
+      #stack { padding: 1rem 1.5rem; }
+      .sobre-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#hero" class="nav-logo">Diego <span>Vásquez</span></a>
+    <ul class="nav-links">
+      <li><a href="#sobre">Sobre mí</a></li>
+      <li><a href="#proyectos">Proyectos</a></li>
+      <li><a href="#caso">Caso de estudio</a></li>
+      <li><a href="#contacto" class="nav-cta">Contacto</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-inner">
+      <span class="hero-tag">Disponible para oportunidades · 2026</span>
+
+      <h1 class="hero-name">
+        Diego<br><span class="accent">Vásquez</span>
+      </h1>
+
+      <p class="hero-role">
+        Desarrollador <span class="highlight">Fullstack</span> —
+        Python · Django · Bootstrap · SQLite · PostgreSQL
+      </p>
+
+      <p class="hero-desc">
+        Construyo aplicaciones web completas con foco en backend robusto,
+        código limpio y buenas prácticas. Actualmente finalizando el
+        bootcamp intensivo de <strong>Alkemy</strong>, con proyectos reales
+        desplegados y documentados.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#proyectos" class="btn-primary">Ver proyectos</a>
+        <a href="#contacto" class="btn-secondary">Contactar</a>
+      </div>
+    </div>
+
+    <!-- Terminal -->
+    <div class="hero-terminal">
+      <div class="terminal-bar">
+        <span class="dot dot-r"></span>
+        <span class="dot dot-y"></span>
+        <span class="dot dot-g"></span>
+        <span class="terminal-title">dvasquez ~ terminal</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">~$</span> <span class="t-cmd">whoami</span></div>
+        <div class="t-out">Diego Vásquez · Desarrollador Fullstack</div>
+        <br>
+        <div><span class="t-prompt">~$</span> <span class="t-cmd">cat skills.json</span></div>
+        <div><span class="t-key">"backend"</span><span class="t-out">:</span> <span class="t-val">["Python", "Django"]</span></div>
+        <div><span class="t-key">"db"</span><span class="t-out">:</span> <span class="t-val">["SQLite", "PostgreSQL"]</span></div>
+        <div><span class="t-key">"frontend"</span><span class="t-out">:</span> <span class="t-val">["HTML", "CSS", "Bootstrap"]</span></div>
+        <div><span class="t-key">"tools"</span><span class="t-out">:</span> <span class="t-val">["Git", "GitHub", "Linux"]</span></div>
+        <br>
+        <div><span class="t-prompt">~$</span> <span class="t-cmd">git log --oneline -3</span></div>
+        <div class="t-out">a3f12c8 Alke Wallet CRUD final</div>
+        <div class="t-out">b7e09d1 Tests unitarios módulo 6</div>
+        <div class="t-out">c1a45f2 Fix auth routes deploy</div>
+        <br>
+        <div><span class="t-prompt">~$</span> <span class="t-cursor"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <div id="stack">
+    <span class="stack-label">Stack</span>
+    <span class="stack-item"><span class="stack-dot"></span>Python 3</span>
+    <span class="stack-item"><span class="stack-dot"></span>Django</span>
+    <span class="stack-item"><span class="stack-dot"></span>PostgreSQL</span>
+    <span class="stack-item"><span class="stack-dot"></span>SQLite</span>
+    <span class="stack-item"><span class="stack-dot"></span>Bootstrap 5</span>
+    <span class="stack-item"><span class="stack-dot"></span>HTML/CSS/JS</span>
+    <span class="stack-item"><span class="stack-dot"></span>Git & GitHub</span>
+    <span class="stack-item"><span class="stack-dot"></span>Linux</span>
+    <span class="stack-item"><span class="stack-dot"></span>REST APIs</span>
+  </div>
+
+  <!-- SOBRE MÍ -->
+  <section id="sobre">
+    <div class="section-header">
+      <span class="section-num">01 //</span>
+      <h2 class="section-title">Sobre mí</h2>
+      <span class="section-line"></span>
+    </div>
+
+    <div class="sobre-grid">
+      <div class="sobre-text">
+        <p>
+          Soy desarrollador Fullstack con especialización en <strong>backend Python/Django</strong>.
+          Durante el bootcamp de Alkemy construí aplicaciones web completas desde cero:
+          modelos relacionales, autenticación, formularios con validación, paneles de
+          administración y suites de pruebas unitarias.
+        </p>
+        <p>
+          Mi enfoque está en <span class="accent-green">código limpio, documentación real
+          y soluciones que funcionan en producción</span>. No solo aprendo la teoría —
+          cada proyecto que construí tiene README técnico detallado, debugging documentado
+          y estructura profesional.
+        </p>
+        <p>
+          Tengo interés activo en <strong>ciberseguridad</strong>, sistemas Linux y
+          arquitectura de soluciones. Mantengo un sistema de aprendizaje autónomo
+          estructurado con Obsidian para gestionar conocimiento técnico acumulado.
+        </p>
+        <p>
+          Busco una posición Junior o Trainee donde pueda contribuir
+          con código de calidad y seguir creciendo en un equipo real.
+        </p>
+      </div>
+
+      <div class="sobre-card">
+        <p class="sobre-card-title">Habilidades técnicas</p>
+        <div class="skill-row">
+          <span class="skill-name">Python / Django</span>
+          <div class="skill-bar-wrap"><div class="skill-bar" style="width:88%"></div></div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-name">HTML / CSS</span>
+          <div class="skill-bar-wrap"><div class="skill-bar" style="width:85%"></div></div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-name">Bootstrap 5</span>
+          <div class="skill-bar-wrap"><div class="skill-bar" style="width:82%"></div></div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-name">Git & GitHub</span>
+          <div class="skill-bar-wrap"><div class="skill-bar" style="width:80%"></div></div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-name">PostgreSQL / SQLite</span>
+          <div class="skill-bar-wrap"><div class="skill-bar" style="width:75%"></div></div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-name">JavaScript (DOM)</span>
+          <div class="skill-bar-wrap"><div class="skill-bar" style="width:65%"></div></div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-name">Linux / Bash</span>
+          <div class="skill-bar-wrap"><div class="skill-bar" style="width:70%"></div></div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-name">Testing (unittest)</span>
+          <div class="skill-bar-wrap"><div class="skill-bar" style="width:72%"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROYECTOS -->
+  <section id="proyectos">
+    <div class="section-header">
+      <span class="section-num">02 //</span>
+      <h2 class="section-title">Proyectos</h2>
+      <span class="section-line"></span>
+    </div>
+
+    <div class="proyectos-grid">
+
+      <!-- PROYECTO DESTACADO: ALKE WALLET -->
+      <div class="project-card featured">
+        <div class="project-body">
+          <span class="project-badge">⭐ Proyecto principal</span>
+          <p class="project-number">01 / ABP Módulo 7</p>
+          <h3 class="project-name">Alke Wallet — Django + SQLite</h3>
+          <p class="project-desc">
+            Billetera digital fullstack. Migración completa desde un frontend HTML/localStorage
+            a un backend Django con base de datos, autenticación real, señales <code>post_save</code>,
+            3 modelos relacionales (Perfil, Contacto, Transaccion), formularios con validación
+            y panel de administración personalizado.
+          </p>
+          <div class="project-tags">
+            <span class="tag">Python</span>
+            <span class="tag">Django</span>
+            <span class="tag">SQLite</span>
+            <span class="tag">Bootstrap 5</span>
+            <span class="tag">Auth</span>
+            <span class="tag">ORM</span>
+            <span class="tag">Signals</span>
+            <span class="tag">Admin</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/dvasquez-design/Alke-Wallet-Django-CRUD" target="_blank" class="project-link">
+              <span class="project-link-arrow">→</span> Ver repositorio
+            </a>
+          </div>
+        </div>
+        <div class="project-visual">
+          <div class="stat-block">
+            <div class="stat-num">10</div>
+            <div class="stat-label">URLs mapeadas</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-num">3</div>
+            <div class="stat-label">Modelos Django</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Rutas protegidas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GESTOR DE PROYECTOS -->
+      <div class="project-card">
+        <div class="project-body">
+          <p class="project-number">02 / ABP Módulo 6</p>
+          <h3 class="project-name">Gestor de Proyectos Django</h3>
+          <p class="project-desc">
+            App de gestión de proyectos con autenticación completa, CRUD con ModelForms
+            y validación personalizada, permisos por usuario, admin panel y suite de
+            más de 15 pruebas unitarias con <code>django.test</code>.
+          </p>
+          <div class="project-tags">
+            <span class="tag">Python</span>
+            <span class="tag">Django</span>
+            <span class="tag">PostgreSQL</span>
+            <span class="tag">ModelForms</span>
+            <span class="tag">Unit Testing</span>
+            <span class="tag">LoginRequiredMixin</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/dvasquez-design/gestor-proyectos-django" target="_blank" class="project-link">
+              <span class="project-link-arrow">→</span> Ver repositorio
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- DJANGO CRUD AUTH -->
+      <div class="project-card">
+        <div class="project-body">
+          <p class="project-number">03 / Práctica Django</p>
+          <h3 class="project-name">Django CRUD Auth — Tareas</h3>
+          <p class="project-desc">
+            CRUD de gestión de tareas con autenticación, decoradores <code>@login_required</code>,
+            registro de usuarios y documentación real del proceso de depuración y resolución
+            de errores (<code>v.12-deploy.md</code>).
+          </p>
+          <div class="project-tags">
+            <span class="tag">Python</span>
+            <span class="tag">Django</span>
+            <span class="tag">SQLite</span>
+            <span class="tag">Auth</span>
+            <span class="tag">Debug</span>
+            <span class="tag">Deploy</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/dvasquez-design/Django-CRUD-auth" target="_blank" class="project-link">
+              <span class="project-link-arrow">→</span> Ver repositorio
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CASO DE ESTUDIO -->
+  <section id="caso">
+    <div class="section-header">
+      <span class="section-num">03 //</span>
+      <h2 class="section-title">Caso de estudio</h2>
+      <span class="section-line"></span>
+    </div>
+
+    <div class="caso-wrapper">
+      <div class="caso-sidebar">
+        <p class="caso-label">Proyecto seleccionado</p>
+        <h3 class="caso-title">Alke Wallet — Migración a Django</h3>
+        <p class="caso-sub">
+          El desafío más representativo de mi crecimiento técnico:
+          migrar una app frontend estática a un sistema backend completo
+          con base de datos real, autenticación y arquitectura escalable.
+        </p>
+        <div class="caso-meta">
+          <div class="meta-item">
+            <span class="meta-key">Módulo</span>
+            <span class="meta-val">ABP Módulo 7 — Alkemy</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Stack principal</span>
+            <span class="meta-val">Python · Django · SQLite · Bootstrap</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Repositorio</span>
+            <span class="meta-val">
+              <a href="https://github.com/dvasquez-design/Alke-Wallet-Django-CRUD"
+                 target="_blank" style="color:var(--green);text-decoration:none;">
+                github.com/dvasquez-design
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="caso-content">
+
+        <div class="caso-block">
+          <h4 class="caso-block-title">
+            <span class="caso-block-icon">📋</span> Descripción de la tarea
+          </h4>
+          <p>
+            Migrar la Alke Wallet desde un frontend estático (HTML + Bootstrap + localStorage)
+            a una aplicación web fullstack con backend Django, base de datos relacional SQLite,
+            sistema de autenticación real y modelos que persisten los datos de manera profesional.
+          </p>
+        </div>
+
+        <div class="caso-block">
+          <h4 class="caso-block-title">
+            <span class="caso-block-icon">⚡</span> Desafío principal
+          </h4>
+          <p>
+            El desafío central fue rediseñar la arquitectura completa: pasar de datos volátiles
+            en localStorage a un modelo de datos relacional con tres entidades (Perfil, Contacto,
+            Transacción) correctamente relacionadas, asegurando que cada operación financiera
+            (depósito, transferencia) fuera atómica y consistente. Un desafío adicional fue
+            garantizar que cada <code>User</code> tuviera siempre su <code>Perfil</code> asociado,
+            independientemente del método de creación.
+          </p>
+        </div>
+
+        <div class="caso-block">
+          <h4 class="caso-block-title">
+            <span class="caso-block-icon">✅</span> Solución propuesta
+          </h4>
+          <ul>
+            <li>Diseño de 3 modelos Django: <code>Perfil</code> (OneToOne), <code>Contacto</code> (ForeignKey) y <code>Transaccion</code> (ForeignKey + choices)</li>
+            <li>Signal <code>post_save</code> para creación automática de Perfil al registrar cualquier User</li>
+            <li>Uso de <code>DecimalField</code> para montos financieros (evita errores de punto flotante)</li>
+            <li>Protección total de rutas con <code>@login_required</code> y configuración de <code>LOGIN_URL</code></li>
+            <li>Mapeo manual del tag <code>error</code> → <code>danger</code> en Bootstrap para mensajes flash</li>
+            <li>Tipificación de transacciones con <code>TIPO_CHOICES</code> para diferenciación semántica</li>
+          </ul>
+        </div>
+
+        <div class="caso-block">
+          <h4 class="caso-block-title">
+            <span class="caso-block-icon">🛠️</span> Herramientas técnicas utilizadas
+          </h4>
+          <ul>
+            <li><strong>Django ORM</strong> — modelado relacional, migraciones, signals</li>
+            <li><strong>django.contrib.auth</strong> — autenticación, UserCreationForm extendido</li>
+            <li><strong>Django Admin</strong> — list_display, list_filter, search_fields</li>
+            <li><strong>Bootstrap 5.3</strong> — UI responsive con Django Template Language</li>
+            <li><strong>SQLite</strong> — base de datos persistente en desarrollo</li>
+            <li><strong>Git + GitHub</strong> — control de versiones y documentación</li>
+          </ul>
+        </div>
+
+        <div class="caso-block">
+          <h4 class="caso-block-title">
+            <span class="caso-block-icon">📊</span> Métricas de impacto
+          </h4>
+          <div class="metrics-grid">
+            <div class="metric-item">
+              <div class="metric-val">10</div>
+              <div class="metric-desc">URLs mapeadas</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-val">3</div>
+              <div class="metric-desc">Modelos relacionales</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-val">4</div>
+              <div class="metric-desc">Tipos de transacción</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-val">0</div>
+              <div class="metric-desc">Pérdidas de datos</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-val">100%</div>
+              <div class="metric-desc">Rutas protegidas</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-val">6</div>
+              <div class="metric-desc">Formularios Django</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="caso-block">
+          <h4 class="caso-block-title">
+            <span class="caso-block-icon">🧠</span> Principales aprendizajes
+          </h4>
+          <ul>
+            <li>Cómo diseñar modelos relacionales desde cero con el ORM de Django</li>
+            <li>El uso de Django Signals como patrón de arquitectura desacoplada</li>
+            <li>La diferencia entre autenticación y autorización en una app web real</li>
+            <li>Por qué usar <code>DecimalField</code> y no <code>FloatField</code> para datos financieros</li>
+            <li>La importancia de la documentación técnica como evidencia de proceso profesional</li>
+          </ul>
+        </div>
+
+        <div class="caso-block">
+          <h4 class="caso-block-title">
+            <span class="caso-block-icon">💡</span> Habilidades técnicas aplicadas
+          </h4>
+          <div class="skill-pills">
+            <span class="skill-pill">Django ORM</span>
+            <span class="skill-pill">Modelos relacionales</span>
+            <span class="skill-pill">Signals post_save</span>
+            <span class="skill-pill">Autenticación Django</span>
+            <span class="skill-pill">Bootstrap 5</span>
+            <span class="skill-pill">Django Admin</span>
+            <span class="skill-pill">ModelForms</span>
+            <span class="skill-pill">login_required</span>
+            <span class="skill-pill">SQLite</span>
+            <span class="skill-pill">Git</span>
+          </div>
+        </div>
+
+        <div class="caso-block">
+          <h4 class="caso-block-title">
+            <span class="caso-block-icon">🎯</span> Por qué elegí este proyecto
+          </h4>
+          <p>
+            Elegí Alke Wallet porque representa la síntesis de todo lo aprendido durante el bootcamp:
+            no es un CRUD simple, sino una aplicación con lógica financiera, múltiples modelos
+            relacionados, arquitectura de señales y consideraciones de seguridad reales. Demuestra
+            que puedo tomar un producto existente, analizar sus limitaciones y reconstruirlo con
+            una arquitectura profesional y escalable. Es, además, el proyecto con documentación
+            técnica más completa de mi portafolio.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto">
+    <div class="contacto-inner">
+      <p class="contacto-eyebrow">// Disponible para oportunidades</p>
+      <h2 class="contacto-title">Construyamos<br>algo juntos.</h2>
+      <p class="contacto-sub">
+        Busco una posición Junior o Trainee donde pueda aportar con código limpio,
+        documentación real y ganas de crecer en un equipo tech. Abierto a modalidad
+        remota, híbrida o presencial en Santiago.
+      </p>
+      <div class="contacto-links">
+        <a href="https://github.com/dvasquez-design" target="_blank" class="contacto-link">
+          ⌥ GitHub
+        </a>
+        <a href="https://linkedin.com/in/dvasquez-design" target="_blank" class="contacto-link">
+          ↗ LinkedIn
+        </a>
+        <a href="mailto:d.vasquezgonzalez95@gmail.com" class="contacto-link">
+          ✉ Email
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 Diego Vásquez — Desarrollador Fullstack</span>
+    <span style="color:var(--green);">dvasquez-design</span>
+    <span>Hecho con HTML · CSS · JS · ♥</span>
+  </footer>
+
+</body>
+</html></
